@@ -20,7 +20,7 @@
  '(ansi-color-names-vector
    ["black" "#d55e00" "#009e73" "#f8ec59" "#0072b2" "#cc79a7" "#56b4e9" "white"])
  '(custom-enabled-themes (quote (deeper-blue)))
- '(package-selected-packages (quote (anaconda-mode chess)))
+ '(package-selected-packages (quote (markdown-mode anaconda-mode chess)))
  '(show-paren-mode t)
  '(size-indication-mode t))
 (custom-set-faces
@@ -38,11 +38,10 @@
 (defun meetingheader (subject timelabel)
   "Insert formatted meeting header with current date at point"
   (interactive "sSubject: \nsTime label: \n")
-  ;;(defvar subjlen (- 87 (length subject)))
-  (set 'subjlen (- 87 (length subject)))
   (insert "=======================================================================================================\n")
-  (insert "=== " subject " " (format-time-string "%m/%d/%y "))
-  (insert (format "%-(symbol-value subjlen)s" timelabel) "===\n")
+  (insert "=== " subject " - " (format-time-string "%m/%d/%y ") " - " timelabel)
+  (insert (concat (make-string (- 81 (+ (length timelabel) (length subject))) (string-to-char " "))))
+  (insert "===\n")
   (insert "=======================================================================================================\n")
   (message "Added meeting header"))
   
