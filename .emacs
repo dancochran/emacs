@@ -1,3 +1,10 @@
+(setq inhibit-splash-screen t)
+
+(transient-mark-mode 1)
+
+(require 'org)
+
+
 (require 'package)
 (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
                     (not (gnutls-available-p))))
@@ -30,18 +37,26 @@
  ;; If there is more than one, they won't work right.
  )
 
+;; always open python files in anaconda mode
 (add-hook 'python-mode-hook 'anaconda-mode)
 
+;; Force extra windows to open on the side (horizontal split) instead of on the bottom
 (setq split-height-threshold nil)
 (setq split-width-threshold 0)
+
+;; Force column numbers always on
+(setq column-number-mode t)
 
 (defun meetingheader (subject timelabel)
   "Insert formatted meeting header with current date at point"
   (interactive "sSubject: \nsTime label: \n")
+  (setq strdate (format-time-string "%A, %B %d, %Y "))
+  ;; magic numbers: 18 is the leading/trailing stuff and the dashes and inline spaces; 103 is the total length of the = header
+  (setq contentlen (+ (length subject) (length timelabel) (length strdate) 18))
   (insert "=======================================================================================================\n")
-  (insert "=== " subject " - " (format-time-string "%m/%d/%y ") " - " timelabel)
-  (insert (concat (make-string (- 81 (+ (length timelabel) (length subject))) (string-to-char " "))))
-  (insert "===\n")
+  (insert "====== " subject " - " strdate "- " timelabel)
+  (insert (concat (make-string (- 103 contentlen) (string-to-char " "))))
+  (insert "======\n")
   (insert "=======================================================================================================\n")
   (message "Added meeting header"))
   
