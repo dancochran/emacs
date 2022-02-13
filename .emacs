@@ -1,11 +1,17 @@
+(require 'org)
+
+(require 'package)
+
+(require 'desktop)
+
 (setq inhibit-splash-screen t)
+
+(setq mouse-drag-copy-region t)
 
 (transient-mark-mode 1)
 
-(require 'org)
+(desktop-save-mode 1)
 
-
-(require 'package)
 (let* ((no-ssl (and (memq system-type '(windows-nt ms-dos))
                     (not (gnutls-available-p))))
        (proto (if no-ssl "http" "https")))
@@ -47,6 +53,13 @@
 ;; Force column numbers always on
 (setq column-number-mode t)
 
+(defun my-desktop-save ()
+  (interactive)
+  ;; Don't call desktop-save-in-desktop-dir, as it prints a message.
+  (if (eq (desktop-owner) (emacs-pid))
+      (desktop-save desktop-dirname)))
+(add-hook 'auto-save-hook 'my-desktop-save)
+
 (defun meetingheader (subject timelabel)
   "Insert formatted meeting header with current date at point"
   (interactive "sSubject: \nsTime label: \n")
@@ -59,4 +72,38 @@
   (insert "======\n")
   (insert "=======================================================================================================\n")
   (message "Added meeting header"))
-  
+
+(defun dan-header (subject)
+  "Insert formatted header with current date at point"
+  (interactive "sSubject: \n")
+  (setq strdate (format-time-string "%A, %B %d, %Y "))
+  ;; magic numbers: 16 is the leading/trailing stuff and the dashes and inline spaces; 103 is the total length of the = header
+  (setq contentlen (+ (length subject) (length strdate) 16))
+  (insert "=======================================================================================================\n")
+  (insert "====== " subject " - " strdate)
+  (insert (concat (make-string (- 103 contentlen) (string-to-char " "))))
+  (insert "======\n")
+  (insert "=======================================================================================================\n")
+  (message "Added header"))
+
+(defun dailystandup (timelabel)
+  "Insert formatted daily standup meeting header with current date at point"
+  (interactive "sTime label: \n")
+  (setq strdate (format-time-string "%A, %B %d, %Y "))
+  ;; magic numbers: 18 is the leading/trailing stuff and the dashes and inline spaces; 103 is the total length of the = header
+  (setq contentlen (+ (length timelabel) (length strdate) 31))
+  (insert "=======================================================================================================\n")
+  (insert "====== Daily standup - " strdate "- " timelabel)
+  (insert (concat (make-string (- 103 contentlen) (string-to-char " "))))
+  (insert "======\n")
+  (insert "=======================================================================================================\n")
+  (insert "\n")
+  (insert "* ME: \n")
+  (insert "  - Yesterday: \n")
+  (insert "  - Today: \n")
+  (insert "  - Blockers: \n")
+  (insert "\n")
+  (insert "* \n")
+  (message "Added daily standup header"))
+
+(put 'downcase-region 'disabled nil)
